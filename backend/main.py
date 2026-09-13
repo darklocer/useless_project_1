@@ -1,9 +1,15 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+import sys
 from pathlib import Path
 import tempfile
 import os
 
+# Ensure workspace root is in sys.path regardless of execution directory
+root_dir = str(Path(__file__).resolve().parent.parent)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from Ai.wigscore import analyze_clip
 
 
