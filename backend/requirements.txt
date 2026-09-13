@@ -3,7 +3,7 @@ uvicorn
 python-multipart
 opencv-python-headless
 opencv-contrib-python-headless
-mediapipe
+mediapipe<=0.10.14
 numpy
 Pillow
 torch

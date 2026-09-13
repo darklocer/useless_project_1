@@ -63,31 +63,62 @@ def get_face_crop(image):
 
     height, width = image.shape[:2]
 
-    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    # 1. Attempt MediaPipe Face Detection
+    face_box = None
+    try:
+        try:
+            import mediapipe.python.solutions.face_detection as mp_face_detection
+        except (ImportError, AttributeError):
+            try:
+                from mediapipe import solutions as mp_solutions
+                mp_face_detection = mp_solutions.face_detection
+            except (ImportError, AttributeError):
+                mp_face_detection = getattr(mp, "solutions", None)
+                if mp_face_detection:
+                    mp_face_detection = mp_face_detection.face_detection
 
-    mp_face_detection = mp.solutions.face_detection
+        if mp_face_detection is not None:
+            rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            with mp_face_detection.FaceDetection(
+                model_selection=0,
+                min_detection_confidence=0.5
+            ) as face_detection:
+                results = face_detection.process(rgb)
+                if results and results.detections:
+                    detection = results.detections[0]
+                    box = detection.location_data.relative_bounding_box
+                    x = max(0, int(box.xmin * width))
+                    y = max(0, int(box.ymin * height))
+                    w = min(int(box.width * width), width - x)
+                    h = min(int(box.height * height), height - y)
+                    face_box = (x, y, w, h)
+    except Exception as e:
+        print(f"MediaPipe detection notice: {e}")
 
-    with mp_face_detection.FaceDetection(
-        model_selection=0,
-        min_detection_confidence=0.5
-    ) as face_detection:
+    if face_box is not None:
+        return face_box
 
-        results = face_detection.process(rgb)
+    # 2. OpenCV Haar Cascade Fallback
+    try:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+        faces = face_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=4,
+            minSize=(30, 30)
+        )
+        if len(faces) > 0:
+            # Pick largest detected face
+            faces = sorted(faces, key=lambda f: f[2] * f[3], reverse=True)
+            x, y, w, h = faces[0]
+            return int(x), int(y), int(w), int(h)
+    except Exception as e:
+        print(f"OpenCV cascade detection notice: {e}")
 
-        if not results.detections:
-            raise ValueError("No face detected")
-
-        detection = results.detections[0]
-
-        box = detection.location_data.relative_bounding_box
-
-        x = max(0, int(box.xmin * width))
-        y = max(0, int(box.ymin * height))
-
-        w = min(int(box.width * width), width - x)
-        h = min(int(box.height * height), height - y)
-
-    return x, y, w, h
+    raise ValueError("No face detected")
 
 
 # ============================================================
