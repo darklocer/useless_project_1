@@ -2,26 +2,25 @@
 
 
 
-# [Project Name] 🎯
+# WIG CHECKER 🎯
 
 
-## Basic Details
-### Team Name: [Name]
+## Checks Whether a person is waering a wig or not
+### Team Name: Abhinav Krishna
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: Abhinav Krishna- MACE
+
 
 ### Project Description
-[2-3 lines about what your project does]
+This is a web based Wig checker that uses AI inorder check whether a person is waering a wig or not
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+How to identify whether a person is wearing a wig or not
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+Easy just upload the photo onto the web
 
 ## Technical Details
 ### Technologies/Components Used
