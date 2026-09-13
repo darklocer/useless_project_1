@@ -1,5 +1,8 @@
 import cv2
-import mediapipe as mp
+try:
+    import mediapipe as mp
+except Exception as e:
+    mp = None
 import numpy as np
 from PIL import Image
 
